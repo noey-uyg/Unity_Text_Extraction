@@ -1,17 +1,23 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class TesseractDemoScript : MonoBehaviour
 {
     [SerializeField] private Texture2D imageToRecognize;
-    [SerializeField] private Text displayText;
+    [SerializeField] private TextMeshProUGUI displayText;
     [SerializeField] private RawImage outputImage;
+    [SerializeField] private RectTransform _imageObject;
+    [SerializeField] private RectTransform _textObject;
     private TesseractDriver _tesseractDriver;
     private string _text = "";
     private Texture2D _texture;
 
     private void Start()
     {
+        _imageObject.sizeDelta = new Vector2(ScreenManager.Instance.ScreenWidth / 2f, _imageObject.sizeDelta.y);
+        _textObject.sizeDelta = new Vector2(ScreenManager.Instance.ScreenHeight / 2f, _textObject.sizeDelta.y);
         Texture2D texture = new Texture2D(imageToRecognize.width, imageToRecognize.height, TextureFormat.ARGB32, false);
         texture.SetPixels32(imageToRecognize.GetPixels32());
         texture.Apply();
