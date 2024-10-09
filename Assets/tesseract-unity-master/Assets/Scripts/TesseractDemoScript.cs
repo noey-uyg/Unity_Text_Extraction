@@ -8,29 +8,43 @@ public class TesseractDemoScript : MonoBehaviour
     [SerializeField] private Texture2D imageToRecognize;
     [SerializeField] private TextMeshProUGUI displayText;
     [SerializeField] private RawImage outputImage;
-    [SerializeField] private RectTransform _imageObject;
-    [SerializeField] private RectTransform _textObject;
     private TesseractDriver _tesseractDriver;
     private string _text = "";
     private Texture2D _texture;
 
-    private void Start()
+    public void SetTexture(Texture2D tex)
     {
-        _imageObject.sizeDelta = new Vector2(ScreenManager.Instance.ScreenWidth / 2f, _imageObject.sizeDelta.y);
-        _textObject.sizeDelta = new Vector2(ScreenManager.Instance.ScreenHeight / 2f, _textObject.sizeDelta.y);
-        Texture2D texture = new Texture2D(imageToRecognize.width, imageToRecognize.height, TextureFormat.ARGB32, false);
-        texture.SetPixels32(imageToRecognize.GetPixels32());
+        Texture2D texture = ConvertToGrayScale(tex);
+        texture.SetPixels32(tex.GetPixels32());
         texture.Apply();
 
         _tesseractDriver = new TesseractDriver();
         Recoginze(texture);
     }
 
+    private Texture2D ConvertToGrayScale(Texture2D originalTex)
+    {
+        Texture2D grayTexture = new Texture2D(originalTex.width, originalTex.height);
+        for(int y=0;y<originalTex.height;y++)
+        {
+            for(int x= 0;x<originalTex.width;x++)
+            {
+                Color pixel = originalTex.GetPixel(x, y);
+                float gray = (pixel.r + pixel.g + pixel.b) / 3f;
+                grayTexture.SetPixel(x,y,new Color(gray,gray,gray));
+            }
+        }
+
+        grayTexture.Apply();
+
+        return grayTexture;
+    }
+
     private void Recoginze(Texture2D outputTexture)
     {
         _texture = outputTexture;
         ClearTextDisplay();
-        AddToTextDisplay(_tesseractDriver.CheckTessVersion());
+
         _tesseractDriver.Setup(OnSetupCompleteRecognize);
     }
 
@@ -49,9 +63,9 @@ public class TesseractDemoScript : MonoBehaviour
     private void AddToTextDisplay(string text, bool isError = false)
     {
         if (string.IsNullOrWhiteSpace(text)) return;
-
+        ClearTextDisplay();
         _text += (string.IsNullOrWhiteSpace(displayText.text) ? "" : "\n") + text;
-
+        
         if (isError)
             Debug.LogError(text);
         else
