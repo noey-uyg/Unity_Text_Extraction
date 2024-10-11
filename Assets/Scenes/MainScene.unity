@@ -1043,6 +1043,7 @@ MonoBehaviour:
   imageToRecognize: {fileID: 2800000, guid: 9ba886a813f3c44cc841c1263b857478, type: 3}
   displayText: {fileID: 985001979}
   outputImage: {fileID: 1667202827}
+  _pageSegMode: 0
 --- !u!1 &1913138100
 GameObject:
   m_ObjectHideFlags: 0

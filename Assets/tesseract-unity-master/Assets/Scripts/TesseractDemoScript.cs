@@ -8,9 +8,20 @@ public class TesseractDemoScript : MonoBehaviour
     [SerializeField] private Texture2D imageToRecognize;
     [SerializeField] private TextMeshProUGUI displayText;
     [SerializeField] private RawImage outputImage;
+    [SerializeField] private PageSegMode _pageSegMode;
+    
     private TesseractDriver _tesseractDriver;
     private string _text = "";
     private Texture2D _texture;
+
+    private Color _originColor;
+
+    private void Start()
+    {
+        _originColor = outputImage.color;
+        Color color = new Color(255, 255, 255, 0f);
+        outputImage.color = color;
+    }
 
     public void SetTexture(Texture2D tex)
     {
@@ -27,7 +38,7 @@ public class TesseractDemoScript : MonoBehaviour
         _texture = outputTexture;
         ClearTextDisplay();
 
-        _tesseractDriver.Setup(OnSetupCompleteRecognize);
+        _tesseractDriver.Setup(OnSetupCompleteRecognize, _pageSegMode);
     }
 
     private void OnSetupCompleteRecognize()
@@ -46,7 +57,7 @@ public class TesseractDemoScript : MonoBehaviour
     {
         if (string.IsNullOrWhiteSpace(text)) return;
         ClearTextDisplay();
-        _text += (string.IsNullOrWhiteSpace(displayText.text) ? "" : "\n") + text;
+        _text = text;
         
         if (isError)
             Debug.LogError(text);
@@ -65,5 +76,6 @@ public class TesseractDemoScript : MonoBehaviour
         rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical,
             rectTransform.rect.width * _tesseractDriver.GetHighlightedTexture().height / _tesseractDriver.GetHighlightedTexture().width);
         outputImage.texture = _tesseractDriver.GetHighlightedTexture();
+        outputImage.color = _originColor;
     }
 }

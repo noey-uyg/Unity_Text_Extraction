@@ -28,10 +28,10 @@ public class TesseractDriver
         }
     }
 
-    public void Setup(UnityAction onSetupComplete)
+    public void Setup(UnityAction onSetupComplete, PageSegMode pageSegMode)
     {
 #if UNITY_EDITOR
-        OcrSetup(onSetupComplete);
+        OcrSetup(onSetupComplete, pageSegMode);
 #elif UNITY_ANDROID
         CopyAllFilesToPersistentData(fileNames, onSetupComplete);
 #else
@@ -39,7 +39,7 @@ public class TesseractDriver
 #endif
     }
 
-    public void OcrSetup(UnityAction onSetupComplete)
+    public void OcrSetup(UnityAction onSetupComplete, PageSegMode pageSegMode)
     {
         _tesseract = new TesseractWrapper();
 
@@ -51,7 +51,7 @@ public class TesseractDriver
         string datapath = Path.Combine(Application.streamingAssetsPath, "tessdata");
 #endif
 
-        if (_tesseract.Init("eng+kor", datapath, PageSegMode.PSM_SINGLE_COLUMN))
+        if (_tesseract.Init("kor", datapath, pageSegMode))
         {
             Debug.Log("Init Successful");
             onSetupComplete?.Invoke();
@@ -62,7 +62,7 @@ public class TesseractDriver
         }
     }
 
-    private async void CopyAllFilesToPersistentData(List<string> fileNames, UnityAction onSetupComplete)
+    private async void CopyAllFilesToPersistentData(List<string> fileNames, UnityAction onSetupComplete, PageSegMode pageSegMode)
     {
         String fromPath = "jar:file://" + Application.dataPath + "!/assets/";
         String toPath = Application.persistentDataPath + "/";
@@ -92,7 +92,7 @@ public class TesseractDriver
             UnZipData(fileName);
         }
 
-        OcrSetup(onSetupComplete);
+        OcrSetup(onSetupComplete, pageSegMode);
     }
 
     public string GetErrorMessage()

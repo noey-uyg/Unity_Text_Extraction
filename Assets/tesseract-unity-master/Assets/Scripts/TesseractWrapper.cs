@@ -199,64 +199,12 @@ public class TesseractWrapper
 #else
     string recognizedText = Marshal.PtrToStringAuto(stringPtr);
 #endif
+        recognizedText = recognizedText.Trim();
 
         TessBaseAPIClear(_tessHandle);
         TessDeleteText(stringPtr);
 
-        // 줄 바꿈을 포함한 텍스트 반환
         return recognizedText;
-    }
-
-    public string RecognizeWithLineBreaks(Texture2D texture)
-    {
-        if (_tessHandle.Equals(IntPtr.Zero))
-            return null;
-
-        _highlightedTexture = texture;
-
-        // 이미지 전처리 단계
-        Texture2D grayTexture = ConvertToGrayscale(_highlightedTexture);
-        Texture2D binaryTexture = BinarizeImage(grayTexture);
-        Texture2D cleanTexture = RemoveNoise(binaryTexture);
-        Texture2D resizedTexture = AdjustResolution(cleanTexture);
-
-        int width = resizedTexture.width;
-        int height = resizedTexture.height;
-        Color32[] colors = resizedTexture.GetPixels32();
-        int count = width * height;
-        int bytesPerPixel = 4;
-        byte[] dataBytes = new byte[count * bytesPerPixel];
-        int bytePtr = 0;
-
-        for (int y = height - 1; y >= 0; y--)
-        {
-            for (int x = 0; x < width; x++)
-            {
-                int colorIdx = y * width + x;
-                dataBytes[bytePtr++] = colors[colorIdx].r;
-                dataBytes[bytePtr++] = colors[colorIdx].g;
-                dataBytes[bytePtr++] = colors[colorIdx].b;
-                dataBytes[bytePtr++] = colors[colorIdx].a;
-            }
-        }
-
-        IntPtr imagePtr = Marshal.AllocHGlobal(count * bytesPerPixel);
-        Marshal.Copy(dataBytes, 0, imagePtr, count * bytesPerPixel);
-
-        TessBaseAPISetImage(_tessHandle, imagePtr, width, height, bytesPerPixel, width * bytesPerPixel);
-
-        if (TessBaseAPIRecognize(_tessHandle, IntPtr.Zero) != 0)
-        {
-            Marshal.FreeHGlobal(imagePtr);
-            return null;
-        }
-
-        // hOCR 텍스트 가져오기
-        string hocrText = GetHOCRText();
-        string processedText = ParseHOCRAndInsertLineBreaks(hocrText);
-
-        Marshal.FreeHGlobal(imagePtr);
-        return processedText;
     }
 
     #region 전처리
