@@ -14,30 +14,12 @@ public class TesseractDemoScript : MonoBehaviour
 
     public void SetTexture(Texture2D tex)
     {
-        Texture2D texture = ConvertToGrayScale(tex);
+        Texture2D texture = tex;
         texture.SetPixels32(tex.GetPixels32());
         texture.Apply();
 
         _tesseractDriver = new TesseractDriver();
         Recoginze(texture);
-    }
-
-    private Texture2D ConvertToGrayScale(Texture2D originalTex)
-    {
-        Texture2D grayTexture = new Texture2D(originalTex.width, originalTex.height);
-        for(int y=0;y<originalTex.height;y++)
-        {
-            for(int x= 0;x<originalTex.width;x++)
-            {
-                Color pixel = originalTex.GetPixel(x, y);
-                float gray = (pixel.r + pixel.g + pixel.b) / 3f;
-                grayTexture.SetPixel(x,y,new Color(gray,gray,gray));
-            }
-        }
-
-        grayTexture.Apply();
-
-        return grayTexture;
     }
 
     private void Recoginze(Texture2D outputTexture)
