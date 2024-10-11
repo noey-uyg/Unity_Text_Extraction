@@ -96,9 +96,14 @@ public class TesseractDemoScript : MonoBehaviour
                 filePath = Path.Combine(desktopPath, "TextFile.txt");
             }
 
-            // 텍스트 파일로 저장
-            File.WriteAllText(filePath, text);
-            Debug.Log($"텍스트가 {filePath}에 저장되었습니다.");
+            // 파일이 존재하는 경우 이어 붙이기, 그렇지 않으면 새로 작성
+            if (File.Exists(filePath))
+            {
+                string temp = "\n\n{ NEW }\n" + text;
+                File.AppendAllText(filePath, temp);
+            }
+            else
+                File.WriteAllText(filePath, text);
         }
         catch (Exception ex)
         {

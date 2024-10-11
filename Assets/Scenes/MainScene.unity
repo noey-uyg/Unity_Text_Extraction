@@ -1044,6 +1044,7 @@ MonoBehaviour:
   displayText: {fileID: 985001979}
   outputImage: {fileID: 1667202827}
   _pageSegMode: 6
+  _bIsSave: 1
 --- !u!1 &1913138100
 GameObject:
   m_ObjectHideFlags: 0
